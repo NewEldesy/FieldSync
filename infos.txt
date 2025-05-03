@@ -1,0 +1,4 @@
+Un utilisateur administrateur par défaut est créé avec les identifiants:
+
+- Email: admin@fieldsync.com
+- Mot de passe: admin123 (à changer après la première connexion)
