@@ -40,6 +40,11 @@
                                 <i class="fas fa-map-marker-alt"></i> Visites
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= (isset($controller) && $controller === 'team') ? 'active' : '' ?>" href="index.php?controller=team&action=index">
+                                <i class="fas fa-users"></i> Teams
+                            </a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">

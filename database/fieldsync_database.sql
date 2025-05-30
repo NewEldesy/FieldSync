@@ -19,32 +19,37 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Table des équipes
-CREATE TABLE IF NOT EXISTS `teams` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `description` text,
-  `created_by` int(11) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `created_by` (`created_by`),
-  CONSTRAINT `teams_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- --------------------------------------------------------
+--
+-- Structure de la table `teams`
+--
 
--- Table des membres d'équipe
-CREATE TABLE IF NOT EXISTS `team_members` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `teams` (
+  `team_id` int(11) NOT NULL AUTO_INCREMENT,
+  `team_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`team_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+--
+-- Structure de la table `team_members`
+--
+
+CREATE TABLE `team_members` (
+  `team_member_id` int(11) NOT NULL AUTO_INCREMENT,
   `team_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `role` enum('admin','member') NOT NULL DEFAULT 'member',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `team_user` (`team_id`,`user_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `team_members_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `team_members_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `role` varchar(50) DEFAULT 'member',
+  `joined_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`team_member_id`),
+  KEY `idx_team_id` (`team_id`),
+  KEY `idx_user_id` (`user_id`),
+  CONSTRAINT `fk_team_members_team` FOREIGN KEY (`team_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_team_members_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Table des visites
 CREATE TABLE IF NOT EXISTS `visits` (
@@ -65,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `visits` (
   KEY `team_id` (`team_id`),
   KEY `date_idx` (`date`),
   CONSTRAINT `visits_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `visits_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE SET NULL
+  CONSTRAINT `visits_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `teams` (`team_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Table des participants aux visites

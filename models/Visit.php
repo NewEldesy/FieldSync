@@ -13,6 +13,7 @@ class Visit {
     public $end_time;
     public $status;
     public $created_by;
+    public $team_id = null; // << MODIFIED: Added team_id property
     public $created_at;
     public $updated_at;
     
@@ -31,7 +32,8 @@ class Visit {
                       start_time = :start_time, 
                       end_time = :end_time, 
                       status = :status, 
-                      created_by = :created_by, 
+                      created_by = :created_by,
+                      team_id = :team_id, /* << MODIFIED: Added team_id to query */
                       created_at = NOW(), 
                       updated_at = NOW()";
         
@@ -46,6 +48,12 @@ class Visit {
         $this->end_time = htmlspecialchars(strip_tags($this->end_time));
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->created_by = htmlspecialchars(strip_tags($this->created_by));
+        // MODIFIED: Sanitize team_id
+        if ($this->team_id !== null && $this->team_id !== '' && is_numeric($this->team_id) && $this->team_id > 0) {
+            $this->team_id = intval(strip_tags($this->team_id));
+        } else {
+            $this->team_id = null;
+        }
         
         // Lier les paramètres
         $stmt->bindParam(":title", $this->title);
@@ -56,6 +64,12 @@ class Visit {
         $stmt->bindParam(":end_time", $this->end_time);
         $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":created_by", $this->created_by);
+        // MODIFIED: Bind team_id
+        if ($this->team_id === null) {
+            $stmt->bindValue(":team_id", null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindParam(":team_id", $this->team_id, PDO::PARAM_INT);
+        }
         
         // Exécuter la requête
         if ($stmt->execute()) {
@@ -68,6 +82,7 @@ class Visit {
     
     // Lire une visite
     public function readOne() {
+        // Query already selects v.* which includes team_id if the column exists in DB.
         $query = "SELECT v.*, u.name as creator_name 
                   FROM " . $this->table_name . " v
                   LEFT JOIN users u ON v.created_by = u.id
@@ -95,6 +110,7 @@ class Visit {
             $this->end_time = $row['end_time'];
             $this->status = $row['status'];
             $this->created_by = $row['created_by'];
+            $this->team_id = $row['team_id']; // << MODIFIED: Assign team_id
             $this->created_at = $row['created_at'];
             $this->updated_at = $row['updated_at'];
             
@@ -106,6 +122,7 @@ class Visit {
     
     // Récupérer toutes les visites
     public function readAll() {
+        // Query already selects v.* which includes team_id.
         $query = "SELECT v.*, u.name as creator_name 
                   FROM " . $this->table_name . " v
                   LEFT JOIN users u ON v.created_by = u.id
@@ -119,6 +136,7 @@ class Visit {
     
     // Récupérer les visites par date
     public function readByDate($date) {
+        // Query already selects v.*
         $query = "SELECT v.*, u.name as creator_name 
                   FROM " . $this->table_name . " v
                   LEFT JOIN users u ON v.created_by = u.id
@@ -134,6 +152,7 @@ class Visit {
     
     // Récupérer les visites à venir
     public function readUpcoming() {
+        // Query already selects v.*
         $query = "SELECT v.*, u.name as creator_name 
                   FROM " . $this->table_name . " v
                   LEFT JOIN users u ON v.created_by = u.id
@@ -156,7 +175,8 @@ class Visit {
                       date = :date, 
                       start_time = :start_time, 
                       end_time = :end_time, 
-                      status = :status, 
+                      status = :status,
+                      team_id = :team_id, /* << MODIFIED: Added team_id to query */
                       updated_at = NOW() 
                   WHERE id = :id";
         
@@ -171,6 +191,12 @@ class Visit {
         $this->end_time = htmlspecialchars(strip_tags($this->end_time));
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->id = htmlspecialchars(strip_tags($this->id));
+        // MODIFIED: Sanitize team_id
+        if ($this->team_id !== null && $this->team_id !== '' && is_numeric($this->team_id) && $this->team_id > 0) {
+            $this->team_id = intval(strip_tags($this->team_id));
+        } else {
+            $this->team_id = null;
+        }
         
         // Lier les paramètres
         $stmt->bindParam(":title", $this->title);
@@ -181,6 +207,12 @@ class Visit {
         $stmt->bindParam(":end_time", $this->end_time);
         $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":id", $this->id);
+        // MODIFIED: Bind team_id
+        if ($this->team_id === null) {
+            $stmt->bindValue(":team_id", null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindParam(":team_id", $this->team_id, PDO::PARAM_INT);
+        }
         
         // Exécuter la requête
         if ($stmt->execute()) {
@@ -277,6 +309,17 @@ class Visit {
         }
         
         return false;
+    }
+
+    // << MODIFIED: Added getTeam() method >>
+    // Get the Team object associated with this visit
+    public function getTeam() {
+        if ($this->team_id && class_exists('Team')) {
+            // Assuming Team model is loaded and has findById static method
+            // Also assuming Team::findById expects $db connection as its first argument
+            return Team::findById($this->conn, $this->team_id);
+        }
+        return null;
     }
 }
 ?>
