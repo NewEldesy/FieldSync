@@ -4,13 +4,13 @@ Outil de gestion des visites de terrain pour équipes techniques (installation, 
 
 ## Fonctionnalités actuelles
 
-- **Planning des visites** — création, suivi statut (en attente / confirmée / annulée), vue liste et vue Kanban
-- **Gestion des équipes** — équipes, membres, rôles
-- **Notifications automatiques** — SMS via Twilio, email via Gmail SMTP
-- **Calendrier** — vue mensuelle des visites planifiées
-- **Tableau de bord** — statistiques, graphique hebdomadaire (Chart.js), planning du jour
-- **Administration** — gestion des utilisateurs et paramètres système
-- **Authentification** — login, register, profil utilisateur, rôles (admin / membre)
+- **Planning des visites :** création, suivi statut (en attente / confirmée / annulée), vue liste et vue Kanban
+- **Gestion des équipes :** équipes, membres, rôles
+- **Notifications automatiques :** SMS via Twilio, email via Gmail SMTP
+- **Calendrier :** vue mensuelle des visites planifiées
+- **Tableau de bord :** statistiques, graphique hebdomadaire (Chart.js), planning du jour
+- **Administration :** gestion des utilisateurs et paramètres système
+- **Authentification :** login, register, profil utilisateur, rôles (admin / membre)
 
 ## Stack technique
 
@@ -76,13 +76,13 @@ SMS_CRON_KEY=votre_cle_secrete
 ## Cron jobs (notifications automatiques)
 
 ```bash
-# Traiter les SMS en attente — toutes les 5 minutes
+# Traiter les SMS en attente toutes les 5 minutes
 */5 * * * * curl "https://votre-domaine.com/index.php?controller=sms&action=processPendingSms&api_key=CRON_KEY"
 
-# Rappels avant visite — toutes les 30 minutes
+# Rappels avant visite toutes les 30 minutes
 */30 * * * * curl "https://votre-domaine.com/index.php?controller=sms&action=sendVisitReminders&api_key=CRON_KEY"
 
-# Résumé quotidien — chaque jour à 7h00
+# Résumé quotidien chaque jour à 7h00
 0 7 * * * curl "https://votre-domaine.com/index.php?controller=sms&action=sendDailySummary&api_key=CRON_KEY"
 ```
 
@@ -96,4 +96,4 @@ SMS_CRON_KEY=votre_cle_secrete
 
 ## Licence
 
-Projet privé — tous droits réservés.
+Projet privé tous droits réservés.
